@@ -1,0 +1,1 @@
+ALTER TABLE "events" ALTER COLUMN "planned_end_time" DROP NOT NULL;
