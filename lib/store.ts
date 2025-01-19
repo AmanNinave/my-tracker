@@ -18,10 +18,30 @@ interface DateStoreType {
 
 export type CalendarEventType = {
   id: string;
+  type: string; // "event" or "task"
+  plannedStartTime: dayjs.Dayjs;
+  plannedEndTime: dayjs.Dayjs;
+  actualStartTime: dayjs.Dayjs | null;
+  actualEndTime: dayjs.Dayjs | null;
+  category: string;
+  subCategory: string;
+  status: string; // "pending", "completed", etc.
   title: string;
-  date: dayjs.Dayjs;
   description: string;
+  remark: string | null;
+  rating: number | null;
+  breaks: string[]; // Array of break descriptions or times
+  subTasks: {
+    id: number;
+    title: string;
+    status: string;
+    description: string;
+  }[];
+  createdAt: dayjs.Dayjs;
+  updatedAt: dayjs.Dayjs;
+  date: dayjs.Dayjs; // Event date
 };
+
 
 type EventStore = {
   events: CalendarEventType[];

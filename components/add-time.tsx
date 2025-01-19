@@ -7,11 +7,13 @@ import { ChevronDown } from "lucide-react"
 
 export default function AddTime({
   onTimeSelect,
+  value
 }: {
   onTimeSelect: (time: string) => void;
+  value : string;
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedTime, setSelectedTime] = useState('00:00')
+  const [selectedTime, setSelectedTime] = useState(value)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function AddTime({
   return (
     <div className="relative" ref={dropdownRef}>
       <Button
+        type='button'
         variant="outline"
         className="w-24 justify-between"
         onClick={() => setIsOpen(!isOpen)}

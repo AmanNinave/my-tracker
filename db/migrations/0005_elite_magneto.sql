@@ -1,0 +1,1 @@
+ALTER TABLE "eventTaskData" ADD COLUMN "sub_tasks" jsonb DEFAULT '[]'::jsonb;

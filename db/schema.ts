@@ -13,7 +13,7 @@
 import { pgTable, text, timestamp, serial, integer, jsonb } from 'drizzle-orm/pg-core';
 
 // Updated Events/Tasks table schema
-export const eventsTable = pgTable('tasks', {
+export const eventsTable = pgTable('eventTaskData', {
   id: serial('id').primaryKey(),  // Unique identifier
   type: text('type').notNull(),  // Type -> 'task' or 'event'
   plannedStartTime: timestamp('planned_start_time').notNull(),  // Planned start time
@@ -22,11 +22,13 @@ export const eventsTable = pgTable('tasks', {
   actualEndTime: timestamp('actual_end_time'),  // Actual end time (optional)
   category: text('category').notNull(),  // Category (e.g., 'work', 'personal')
   subCategory: text('sub_category'),  // Sub-category (optional)
+  status: text('status'),  // Status (optional)
   title: text('title').notNull(),  // Title
   description: text('description').notNull(),  // Description
   remark: text('remark'),  // Remarks (optional)
   rating: integer('rating'),  // Rating (optional, numeric)
-  breaks: jsonb('breaks').default([]),  // Breaks as an array of objects [{ start-time, end-time, remark }]
+  breaks: jsonb('breaks').default([]),  // Breaks as an array of objects [{ start-time, end-time, remark , category}]
+  subTasks: jsonb('sub_tasks').default([]),  // subtask as an array of objects [{ title, description, status, remark , timestamp }]
   createdAt: timestamp('created_at').defaultNow().notNull(),  // Timestamp of creation
   updatedAt: timestamp('updated_at').defaultNow().notNull(),  // Timestamp of last update
 });

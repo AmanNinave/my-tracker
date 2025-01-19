@@ -13,6 +13,7 @@ import { FiClock } from "react-icons/fi";
 import AddTime from "./add-time";
 import { createEvent } from "@/app/actions/event-actions";
 import { cn } from "@/lib/utils";
+import { Textarea } from "./ui/textarea";
 
 interface EventPopoverProps {
   isOpen: boolean;
@@ -20,16 +21,60 @@ interface EventPopoverProps {
   date: string;
 }
 
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  status: string,
+}
+
+const categories = [
+  "Work",
+  "Personal",
+  "Health",
+  "Finance",
+  "Education",
+  "Shopping",
+  "Travel",
+  "Entertainment",
+  "Family",
+  "Other",
+];
+
+const subcategories = [
+  "Urgent",
+  "Important",
+  "Optional",
+  "Planned",
+  "Unplanned",
+  "Meeting",
+  "Deadline",
+  "Follow-up",
+  "Relaxation",
+  "Miscellaneous",
+];
+
+
 export default function EventPopover({
   isOpen,
   onClose,
   date,
 }: EventPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
-  const [selectedTime, setSelectedTime] = useState("00:00");
+  const [type, setType] = useState('event');
+  // const [selectedTime, setSelectedTime] = useState("00:00");
+  const [plannedStartTime , setPlannedStartTime] = useState("00:00");
+  const [plannedEndTime , setPlannedEndTime] = useState("00:00");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [category, setCategory] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
+  const [customSubcategory, setCustomSubcategory] = useState("");
+  const [status, setStatus] = useState("pending");
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskIdCounter, setTaskIdCounter] = useState(1);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -64,7 +109,7 @@ export default function EventPopover({
     setSuccess(null);
     startTransition(async () => {
       try {
-        const result = await createEvent(formData);
+        const result = await createEvent(formData, tasks);
         if ("error" in result) {
           setError(result.error);
         } else if (result.success) {
@@ -79,6 +124,26 @@ export default function EventPopover({
     });
   }
 
+  const handleAddTask = () => {
+    setTasks([
+      ...tasks,
+      { id: taskIdCounter, title: "", description: "", status: "pending" },
+    ]);
+    setTaskIdCounter(taskIdCounter + 1);
+  };
+
+  const handleTaskChange = (id: number, field: keyof Task, value: string) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, [field]: value } : task
+      )
+    );
+  };
+
+  const handleRemoveTask = (id: number) => {
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
@@ -91,6 +156,10 @@ export default function EventPopover({
       >
         <div className="mb-2 flex items-center justify-between rounded-md bg-slate-100 p-1">
           <HiOutlineMenuAlt4 />
+          {/* <FiClock className="size-5 text-gray-600" /> */}
+          <div className="flex items-center space-x-3 text-sm">
+              <p>{dayjs(date).format("dddd, MMMM D")}</p>
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -101,6 +170,18 @@ export default function EventPopover({
           </Button>
         </div>
         <form className="space-y-4 p-6" action={onSubmit}>
+          {/* Event Task */}
+          <div className="flex items-center justify-start">
+            <Button type="button" onClick={() => setType('event')} variant="ghost"  className={`${type=="event" ? "bg-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-700" : ""}`}>
+              Event
+            </Button>
+            <Button type="button" onClick={() => setType('task')} variant="ghost" className={`${type=="task" ? "bg-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-700" : ""}`}>
+              Task
+            </Button>
+            <input type="hidden"  name="type" value={type} />
+          </div>
+
+          {/* Title */}
           <div>
             <Input
               type="text"
@@ -109,45 +190,88 @@ export default function EventPopover({
               className="my-4 rounded-none border-0 border-b text-2xl focus-visible:border-b-2 focus-visible:border-b-blue-600 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
-          <div className="flex items-center justify-between">
-            <Button className="bg-blue-100 text-blue-700 hover:bg-blue-100 hover:text-blue-700">
-              Event
-            </Button>
-            <Button type="button" variant="ghost">
-              Task
-            </Button>
-            <Button type="button" variant="ghost">
-              Appointmet Schedule <sup className="bg-blue-500">new</sup>
-            </Button>
+
+          {/* Planned start Time */}
+          <div className="flex items-center justify-between space-x-3">
+            <input type="hidden" name="date" value={date} />
+            <div className="flex items-center space-x-3">
+              <div>{type == 'event' ? "Start Time" : "Time"}</div>
+              <div className="flex items-center space-x-3 text-sm">
+                <AddTime value={"00:00"} onTimeSelect={setPlannedStartTime} />
+                <input type="hidden" name="plannedStartTime" value={plannedStartTime} />
+              </div>
+            </div>
+            {type == 'event' && 
+              <div className="flex items-center space-x-3">
+                <div>End Time</div>
+                <div className="flex items-center space-x-3 text-sm">
+                  <AddTime value={"00:00"} onTimeSelect={setPlannedEndTime} />
+                  <input type="hidden" name="plannedEndTime" value={plannedEndTime} />
+                </div>
+              </div>
+            }
           </div>
 
-          <div className="flex items-center space-x-3">
-            <FiClock className="size-5 text-gray-600" />
-            <div className="flex items-center space-x-3 text-sm">
-              <p>{dayjs(date).format("dddd, MMMM D")}</p>
-              <AddTime onTimeSelect={setSelectedTime} />
-              <input type="hidden" name="date" value={date} />
-              <input type="hidden" name="time" value={selectedTime} />
+          {/* Category & Subcategory Dropdown */}
+          <div className="flex justify-between gap-3 pl-3 pr-3" >
+            {/* Category Dropdown */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                name="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 h-7"
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Subcategory Dropdown */}
+            <div className="mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subcategory
+              </label>
+              <select
+                name="subCategory"
+                value={subcategory}
+                onChange={(e) => setSubcategory(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 h-7"
+              >
+                <option value="" disabled>
+                  Select a subcategory
+                </option>
+                {subcategories.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+              {/* <div className="mt-2">
+                <Input
+                  type="text"
+                  placeholder="Add custom subcategory"
+                  value={customSubcategory}
+                  onChange={(e) => setCustomSubcategory(e.target.value)}
+                  onBlur={() => setSubcategory(customSubcategory)}
+                />
+              </div> */}
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <HiOutlineUsers className="size-5 text-slate-600" />
-            <Input
-              type="text"
-              name="guests"
-              placeholder="Add guests"
-              className={cn(
-                "w-full rounded-lg border-0 bg-slate-100 pl-7 placeholder:text-slate-600",
-                "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0",
-              )}
-            />
-          </div>
-
-          <div className="flex items-center space-x-3">
+          {/* Description */}
+          <div className="flex items-start space-x-3 mt-4">
             <HiOutlineMenuAlt2 className="size-5 text-slate-600" />
-            <Input
-              type="text"
+            <Textarea
               name="description"
               placeholder="Add description"
               className={cn(
@@ -157,23 +281,80 @@ export default function EventPopover({
             />
           </div>
 
-          <div className="flex items-center space-x-3">
-            <IoMdCalendar className="size-5 text-slate-600" />
-            <div className="">
-              <div className="flex items-center space-x-3 text-sm">
-                {" "}
-                <p>De Mawo</p>{" "}
-                <div className="h-4 w-4 rounded-full bg-violet-500"></div>{" "}
-              </div>
-              <div className="flex items-center space-x-1 text-xs">
-                <span>Busy</span>
-                <div className="h-1 w-1 rounded-full bg-gray-500"></div>
-                <span>Default visibility</span>{" "}
-                <div className="h-1 w-1 rounded-full bg-gray-500"></div>
-                <span>Notify 30 minutes before</span>
-              </div>
+           {/* Status Radio Buttons */}
+           <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Status
+            </label>
+            <div className="flex items-center space-x-4">
+              {["Pending", "In Progress", "Completed"].map((s) => (
+                <label key={s} className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="status"
+                    value={s.toLowerCase()}
+                    checked={status === s.toLowerCase()}
+                    onChange={() => setStatus(s.toLowerCase())}
+                  />
+                  <span>{s}</span>
+                </label>
+              ))}
             </div>
           </div>
+          {/* Task section */}
+          { type == 'event' &&
+            <div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-700">
+                  Tasks
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="text-blue-600"
+                  onClick={handleAddTask}
+                >
+                  Add Task
+                </Button>
+              </div>
+              <div className="space-y-4 mt-2">
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="flex items-start space-x-3 border p-2 rounded-lg"
+                  > 
+                    <div className="w-full">
+                      <Input
+                        type="text"
+                        placeholder="Task Title"
+                        value={task.title}
+                        onChange={(e) =>
+                          handleTaskChange(task.id, "title", e.target.value)
+                        }
+                        className="flex-1"
+                      />
+                      <Textarea
+                        placeholder="Description"
+                        value={task.description}
+                        onChange={(e : any) =>
+                          handleTaskChange(task.id, "description", e.target.value)
+                        }
+                        className="flex-1 "
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveTask(task.id)}
+                    >
+                      <IoCloseSharp className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
 
           <div className="flex justify-end space-x-2">
             <Button type="submit" disabled={isPending}>
