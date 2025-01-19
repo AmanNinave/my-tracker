@@ -30,7 +30,12 @@ export type CalendarEventType = {
   description: string;
   remark: string | null;
   rating: number | null;
-  breaks: string[]; // Array of break descriptions or times
+  breaks: { 
+    startTime : Date | null , 
+    endTime : Date | null , 
+    remark : string, 
+    category : string
+  }[]; // Array of break descriptions or times
   subTasks: {
     id: number;
     title: string;

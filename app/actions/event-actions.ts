@@ -106,8 +106,7 @@ export async function updateEventField(
   if (updates.actualEndTime) {
     formattedUpdates.actualEndTime = new Date(updates.actualEndTime);
   }
-  
-  console.log("updates", updates);
+
   try {
     await db.update(eventsTable)
       .set(formattedUpdates)
@@ -124,21 +123,21 @@ export async function updateEventField(
 }
 
 
-// Function to delete an event or task
-// export async function deleteEvent(eventId: string): Promise<{ error: string } | { success: boolean }> {
-//   if (!eventId) {
-//     return { error: 'Event ID is required' };
-//   }
+// function to delete an event or task
+export async function deleteEvent(eventId: number): Promise<{ error: string } | { success: boolean }> {
+  if (!eventId) {
+    return { error: 'Event ID is required' };
+  }
 
-//   try {
-//     await db.delete(eventsTable).where(eventsTable.id.eq(eventId));
+  try {
+    await db.delete(eventsTable).where(eq(eventsTable.id, eventId));
 
-//     // Revalidate the path and return a success response
-//     revalidatePath("/");
+    // Revalidate the path and return a success response
+    revalidatePath("/");
 
-//     return { success: true };
-//   } catch (error) {
-//     console.error('Error deleting event:', error);
-//     return { error: 'Failed to delete event' };
-//   }
-// }
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    return { error: 'Failed to delete event' };
+  }
+}

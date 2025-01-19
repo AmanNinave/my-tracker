@@ -74,7 +74,6 @@ export default function EventPopover({
   const [customSubcategory, setCustomSubcategory] = useState("");
   const [status, setStatus] = useState("pending");
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [taskIdCounter, setTaskIdCounter] = useState(1);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,7 +115,7 @@ export default function EventPopover({
           setSuccess(result.success);
           setTimeout(() => {
             onClose();
-          }, 2000);
+          }, 200);
         }
       } catch {
         setError("An unexpected error occurred. Please try again.");
@@ -127,9 +126,8 @@ export default function EventPopover({
   const handleAddTask = () => {
     setTasks([
       ...tasks,
-      { id: taskIdCounter, title: "", description: "", status: "pending" },
+      { id: Number(Date.now()), title: "", description: "", status: "Pending" },
     ]);
-    setTaskIdCounter(taskIdCounter + 1);
   };
 
   const handleTaskChange = (id: number, field: keyof Task, value: string) => {
