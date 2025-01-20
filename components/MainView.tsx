@@ -31,7 +31,7 @@ export default function MainView({
   } = useEventStore();
 
   const { userSelectedDate } = useDateStore();
-  console.log(eventsData)
+  
   useEffect(() => {
     const mappedEvents: CalendarEventType[] = eventsData.map((event) => ({
       id: event.id,
