@@ -8,11 +8,12 @@ import {
 import MonthView from "./month-view";
 import SideBar from "./sidebar/SideBar";
 import WeekView from "./week-view";
-import DayView from "./day-view";
+// import DayView from "./day-view";
 import EventPopover from "./event-popover";
 import {EventSummaryPopover}  from "./event-summary-popover";
 import { useEffect } from "react";
 import dayjs from "dayjs";
+import DayView from "./day-view-test";
 
 export default function MainView({
   eventsData,
