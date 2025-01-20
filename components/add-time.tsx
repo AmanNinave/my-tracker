@@ -72,6 +72,14 @@ export default function AddTime({
                   {time}
                 </Button>
               ))}
+              <Button
+                  key={"23:59"}
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleTimeSelect("23:59")}
+                >
+                  {"23:59"}
+                </Button>
             </div>
           </ScrollArea>
         </div>
