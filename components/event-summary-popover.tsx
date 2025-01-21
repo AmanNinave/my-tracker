@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useTransition, useMemo } from "react";
+import React, { useRef, useEffect, useState, useTransition, useMemo, ChangeEvent } from "react";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import { IoCloseSharp } from "react-icons/io5";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarEventType } from "@/lib/store";
-import { HiOutlineMenuAlt4 } from "react-icons/hi";
 import { FiClock } from "react-icons/fi";
-import { createEvent, deleteEvent, updateEventField } from "@/app/actions/event-actions";
+import { deleteEvent, updateEventField } from "@/app/actions/event-actions";
 import AddTime from "./add-time";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-import { categories, Task, subcategories, breakCategories, statuses } from "@/utils/constants";
+import { categories, Task, subcategories, breakCategories, statuses, Break, EventUpdates } from "@/utils/constants";
 
 interface EventSummaryPopoverProps {
   isOpen: boolean;
@@ -37,7 +35,6 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
   const popoverRef = useRef<HTMLDivElement>(null);
   const [editableEvent, setEditableEvent] = useState<CalendarEventType>(event);
   const [isEditMode, setIsEditMode] = useState(false); // Add edit mode state
-  const [startShift, setStartShift] = useState(false); // Add edit mode state
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
@@ -62,25 +59,30 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
     };
   }, [isOpen, onClose]);
 
-  const handleChange = (field: keyof CalendarEventType, value: any) => { 
-    let updatedValue = value;
-    if(field =='plannedEndTime' || field =='plannedStartTime' ){
-      updatedValue = `${event?.[field]?.format("YYYY-MM-DD")}T${value}:00`
+  const handleChange = (field: keyof CalendarEventType, value: string | Date | number | undefined | null | Task[] | Break[]) => {
+    let updatedValue: string | Date | Task[] | Break[] | null | number | undefined = value;
+  
+    if (field === 'plannedEndTime' || field === 'plannedStartTime') {
+      if (typeof event?.[field] !== 'undefined' && event?.[field] !== null) {
+          updatedValue = `${dayjs(event[field]).format("YYYY-MM-DD")}T${value}:00`;
+      } else {
+          updatedValue = null; // Or handle the undefined/null case differently
+      }
+    } else if (field === 'actualEndTime' || field === 'actualStartTime') {
+      updatedValue = new Date();
     }
-    if(field =='actualEndTime' || field == 'actualStartTime'){
-      updatedValue = (new Date()).toString();
-    }
-    setUpdatedData((prev : any) => ({
+  
+    setUpdatedData((prev: Partial<CalendarEventType>) => ({
       ...prev,
-      [field] : updatedValue
-    }))
-    setEditableEvent((prev : any) => ({
+      [field]: updatedValue,
+    }));
+  
+    setEditableEvent((prev: CalendarEventType) => ({
       ...prev,
       [field]: updatedValue,
     }));
   };
-
-  const handleSave = (updatedData : any) => {
+  const handleSave = (updatedData: Partial<EventUpdates>) => {
     setError(null);
     setSuccess(null);
     startTransition(async () => {
@@ -117,7 +119,7 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
   };
 
   const handleTaskChange = (id: number, field: keyof Task, value: string) => {
-    let updatedTasks = editableEvent.subTasks?.map((task) => task.id === id ? { ...task, [field]: value } : task ) || [];
+    const updatedTasks = editableEvent.subTasks?.map((task) => task.id === id ? { ...task, [field]: value } : task ) || [];
     handleChange('subTasks' , updatedTasks );
   };
 
@@ -137,14 +139,14 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
     handleSave({breaks : breaksData});
   }
 
-  const handlePauseAndResumeBreak = (breakData : any) => {
+  const handlePauseAndResumeBreak = (breakData : Break) => {
     setBreaksObj({...breakData});
     setIsBreakBoxActive(true);
   }
 
   const breakData = useMemo(() => {
     if(event.breaks.length > 0){
-      let lastBreakData = event.breaks[event.breaks.length-1];
+      const lastBreakData = event.breaks[event.breaks.length-1];
       if(lastBreakData.endTime == null && lastBreakData.startTime !== null){
         return {...lastBreakData, state : "Resume"};
       }else{
@@ -323,7 +325,7 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
                           <Textarea
                             placeholder="Description"
                             value={task.description}
-                            onChange={(e : any) =>
+                            onChange={(e : ChangeEvent<HTMLTextAreaElement>) =>
                               handleTaskChange(task.id, "description", e.target.value)
                             }
                             className="flex-1 "
@@ -403,16 +405,14 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
               <div>
                 <strong onClick={() => {setShowBreaks(!showBreaks)}}>Breaks</strong>
                 { showBreaks && <ul className="list-disc pl-5">
-                  {editableEvent.breaks.map((val : any) => (
-                    <li  className="border rounded-md border-gray-200 py-2 px-4 mb-2">
+                  {editableEvent.breaks.map((val : Break , i : number) => (
+                    <li key={i}  className="border rounded-md border-gray-200 py-2 px-4 mb-2">
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{dayjs(val.startTime).format("HH:mm")}</span>
                         <span className="font-medium">{dayjs(val.endTime).format("HH:mm")}</span>
                         {/* Conditionally display status with background color */}
                         <span
-                          className={`ml-2 text-sm font-medium px-2 py-1 rounded-md ${getStatusColor(
-                            val.status
-                          )}`}
+                          className={`ml-2 text-sm font-medium px-2 py-1 rounded-md`}
                         >
                           {val.category}
                         </span>

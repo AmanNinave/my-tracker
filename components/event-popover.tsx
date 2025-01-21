@@ -1,15 +1,12 @@
-import React, { useEffect, useRef, useState, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition , ChangeEvent } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import dayjs from "dayjs";
 import {
   HiOutlineMenuAlt2,
   HiOutlineMenuAlt4,
-  HiOutlineUsers,
 } from "react-icons/hi";
 import { IoCloseSharp } from "react-icons/io5";
-import { IoMdCalendar } from "react-icons/io";
-import { FiClock } from "react-icons/fi";
 import AddTime from "./add-time";
 import { createEvent } from "@/app/actions/event-actions";
 import { cn } from "@/lib/utils";
@@ -36,9 +33,7 @@ export default function EventPopover({
   const [success, setSuccess] = useState<boolean | null>(null);
   const [isPending, startTransition] = useTransition();
   const [category, setCategory] = useState("");
-  const [customCategory, setCustomCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
-  const [customSubcategory, setCustomSubcategory] = useState("");
   const [status, setStatus] = useState("pending");
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -301,7 +296,7 @@ export default function EventPopover({
                       <Textarea
                         placeholder="Description"
                         value={task.description}
-                        onChange={(e : any) =>
+                        onChange={(e : ChangeEvent<HTMLTextAreaElement>) =>
                           handleTaskChange(task.id, "description", e.target.value)
                         }
                         className="flex-1 "

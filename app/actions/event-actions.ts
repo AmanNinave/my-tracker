@@ -4,7 +4,7 @@ import { db } from "@/db/drizzle";
 import { eventsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { Task } from "@/utils/constants";
+import { Break, Task } from "@/utils/constants";
 
 // Function to create an event or task
 export async function createEvent(formData: FormData, tasks : Task[]): Promise<{ error: string } | { success: boolean }> {
@@ -74,7 +74,7 @@ interface EventUpdates {
   description: string;
   remark: string;
   rating: number | null;
-  breaks: Array<{ startTime : Date | null , endTime : Date | null , remark : string , category : string }>;
+  breaks: Array<Break>;
   status: string;
   subTasks: Task[];
 }
