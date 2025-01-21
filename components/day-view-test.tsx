@@ -60,10 +60,10 @@ const App: React.FC = () => {
       let width = 'calc(100% - 120px)';
       let left = '90px';
 
-      if (overlappingEvents.length > 0) {
-          width = `calc((100% - 120px) / ${overlappingEvents.length + 1})`;
-          left = `${90 + overlappingEvents.findIndex(e => e === event) * parseFloat(width)}px`;
-      }
+      // if (overlappingEvents.length > 0) {
+      //     width = `calc((100% - 120px) / ${overlappingEvents.length + 1})`;
+      //     left = `${90 + overlappingEvents.findIndex(e => e === event) * parseFloat(width)}px`;
+      // }
 
       return (
         <div
