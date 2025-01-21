@@ -12,55 +12,13 @@ import { FiClock } from "react-icons/fi";
 import { createEvent, deleteEvent, updateEventField } from "@/app/actions/event-actions";
 import AddTime from "./add-time";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
+import { categories, Task, subcategories, breakCategories, statuses } from "@/utils/constants";
 
 interface EventSummaryPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   event: CalendarEventType;
 }
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string,
-}
-
-const categories = [
-  "Work",
-  "Personal",
-  "Health",
-  "Finance",
-  "Education",
-  "Shopping",
-  "Travel",
-  "Entertainment",
-  "Family",
-  "Other",
-];
-
-const subcategories = [
-  "Urgent",
-  "Important",
-  "Optional",
-  "Planned",
-  "Unplanned",
-  "Meeting",
-  "Deadline",
-  "Follow-up",
-  "Relaxation",
-  "Miscellaneous",
-];
-
-const breakCategories = [
-  "Essential", // Breaks that are absolutely necessary (e.g., meal, rest).
-  "Unessential", // Breaks that are not necessary (e.g., social media, shorts, movie).
-  "Optional",  // Breaks that can be taken but are not mandatory.
-  "Planned",   // Scheduled breaks (e.g., meetings, tasks, etc.).
-  "Unplanned", // Unscheduled or spontaneous breaks.
-  "Urgent",    // Breaks needed immediately due to emergencies or high priority.
-];
-
-const statuses = ["Pending", "In Progress", "Completed"];
 
 function getStatusColor(status : string) {
   switch (status) {
@@ -449,7 +407,7 @@ export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopo
                     <li  className="border rounded-md border-gray-200 py-2 px-4 mb-2">
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{dayjs(val.startTime).format("HH:mm")}</span>
-                        <span className="font-medium">{dayjs(val.startTime).format("HH:mm")}</span>
+                        <span className="font-medium">{dayjs(val.endTime).format("HH:mm")}</span>
                         {/* Conditionally display status with background color */}
                         <span
                           className={`ml-2 text-sm font-medium px-2 py-1 rounded-md ${getStatusColor(

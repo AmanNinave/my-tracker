@@ -14,46 +14,13 @@ import AddTime from "./add-time";
 import { createEvent } from "@/app/actions/event-actions";
 import { cn } from "@/lib/utils";
 import { Textarea } from "./ui/textarea";
+import { categories, Task, subcategories, statuses } from "@/utils/constants";
 
 interface EventPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   date: string;
 }
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string,
-}
-
-const categories = [
-  "Work",
-  "Personal",
-  "Health",
-  "Finance",
-  "Education",
-  "Shopping",
-  "Travel",
-  "Entertainment",
-  "Family",
-  "Other",
-];
-
-const subcategories = [
-  "Urgent",
-  "Important",
-  "Optional",
-  "Planned",
-  "Unplanned",
-  "Meeting",
-  "Deadline",
-  "Follow-up",
-  "Relaxation",
-  "Miscellaneous",
-];
-
 
 export default function EventPopover({
   isOpen,
@@ -285,7 +252,7 @@ export default function EventPopover({
               Status
             </label>
             <div className="flex items-center space-x-4">
-              {["Pending", "In Progress", "Completed"].map((s) => (
+              {statuses.map((s) => (
                 <label key={s} className="flex items-center space-x-2">
                   <input
                     type="radio"
