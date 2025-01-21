@@ -24,7 +24,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const authOptions = {
+const authOptions = { // Keep authOptions as a const
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID || "",
@@ -33,14 +33,14 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token, user }: { session: Session; token: JWT; user: User }) {
+    async session({ session, token }: { session: Session; token: JWT }) { // Corrected types
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
       }
       return session;
     },
-    async jwt({ token, account, user }: { token: JWT; account: any; user: User | undefined }) {
+    async jwt({ token, account, user }: { token: JWT; account: any; user?: User }) { // Corrected types
       if (account && user) {
         token.id = user.id;
         token.role = user.role;
@@ -50,5 +50,6 @@ export const authOptions = {
   },
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+const handler = NextAuth(authOptions); // Pass authOptions to NextAuth
+
+export { handler as GET, handler as POST }; // Correct exports
