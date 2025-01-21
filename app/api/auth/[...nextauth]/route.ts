@@ -1,17 +1,20 @@
 // app/api/auth/[...nextauth]/route.ts
-import NextAuth, { DefaultSession, DefaultUser, Session, User } from "next-auth";
+import NextAuth from "next-auth/next";
 import GithubProvider from "next-auth/providers/github";
+import { NextAuthOptions } from "next-auth"; // Import NextAuthOptions
 import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
-  interface Session extends DefaultSession {
+  interface Session {
     user: {
       id: string;
       role?: string;
-    } & DefaultSession["user"];
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
   }
-
-  interface User extends DefaultUser {
+  interface User {
     id: string;
     role?: string;
   }
@@ -24,7 +27,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const authOptions = { // Now correctly exported
+export const authOptions: NextAuthOptions = { // Correct type annotation
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID || "",
@@ -33,14 +36,14 @@ export const authOptions = { // Now correctly exported
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async session({ session, token }: { session: Session; token: JWT }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string | undefined;
       }
       return session;
     },
-    async jwt({ token, account, user }: { token: JWT; account: any; user?: User }) {
+    async jwt({ token, account, user }: { token: JWT; account: any; user?: any }) {
       if (account && user) {
         token.id = user.id;
         token.role = user.role;
