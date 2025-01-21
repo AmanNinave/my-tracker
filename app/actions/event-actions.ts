@@ -4,13 +4,7 @@ import { db } from "@/db/drizzle";
 import { eventsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: string,
-}
+import { Task } from "@/utils/constants";
 
 // Function to create an event or task
 export async function createEvent(formData: FormData, tasks : Task[]): Promise<{ error: string } | { success: boolean }> {
@@ -67,25 +61,27 @@ export async function createEvent(formData: FormData, tasks : Task[]): Promise<{
   }
 }
 
+interface EventUpdates {
+  type: string | null;
+  date: string | Date | null;
+  plannedStartTime: string | Date | null;
+  plannedEndTime: string | Date | null;
+  actualStartTime: string | Date | null;
+  actualEndTime: string | Date | null;
+  category: string;
+  subCategory: string;
+  title: string;
+  description: string;
+  remark: string;
+  rating: number | null;
+  breaks: Array<{ startTime : Date | null , endTime : Date | null , remark : string , category : string }>;
+  status: string;
+  subTasks: Task[];
+}
+
 export async function updateEventField(
   eventId: number,
-  updates: Partial<{
-    type: string;
-    date: string;
-    plannedStartTime: string;
-    plannedEndTime: string;
-    actualStartTime: string;
-    actualEndTime: string;
-    category: string;
-    subCategory: string;
-    title: string;
-    description: string;
-    remark: string;
-    rating: number | null;
-    breaks: any[];
-    status: string;
-    subTasks: any[];
-  }>
+  updates: Partial<EventUpdates>
 ): Promise<{ success: boolean } | { error: string }> {
   if (!eventId || Object.keys(updates).length === 0) {
     return { error: "Event ID and at least one update field are required." };

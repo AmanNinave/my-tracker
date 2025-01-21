@@ -69,7 +69,7 @@ const App: React.FC = () => {
         return (
           <div
             key={index}
-            className="absolute bg-blue-500 text-white rounded-md p-2 text-sm shadow-md border border-white-300 "
+            className="absolute bg-blue-500 text-white rounded-md p-2 pt-0 text-sm shadow-md border border-white-300 overflow-hidden group"
             style={{
               top: `${top}px`,
               height: `${duration}px`,
