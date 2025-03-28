@@ -15,6 +15,9 @@ get_db = database.get_db
 def all(db: Session = Depends(get_db),current_user: schemas.User = Depends(oauth2.get_current_user)):
     return blog.get_all(db)
 
+@router.get('/{id}', status_code=200, response_model=schemas.ShowBlog)
+def show(id:int, db: Session = Depends(get_db),current_user: schemas.User = Depends(oauth2.get_current_user)):
+    return blog.show(id,db)
 
 @router.post('/', status_code=status.HTTP_201_CREATED,)
 def create(request: schemas.Blog, db: Session = Depends(get_db),current_user: schemas.User = Depends(oauth2.get_current_user)):
@@ -29,7 +32,3 @@ def destroy(id:int, db: Session = Depends(get_db),current_user: schemas.User = D
 def update(id:int, request: schemas.Blog, db: Session = Depends(get_db),current_user: schemas.User = Depends(oauth2.get_current_user)):
     return blog.update(id,request, db)
 
-
-@router.get('/{id}', status_code=200, response_model=schemas.ShowBlog)
-def show(id:int, db: Session = Depends(get_db),current_user: schemas.User = Depends(oauth2.get_current_user)):
-    return blog.show(id,db)
