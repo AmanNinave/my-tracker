@@ -1,5 +1,7 @@
 "use client";
 import { useState, ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API;
 
 interface FormData {
@@ -10,6 +12,7 @@ interface FormData {
 export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({ username: "", password: "" });
+  const router = useRouter();
   
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,10 +31,11 @@ export default function LoginPage() {
         }).toString(),
       });
       const result = await response.json();
-      
+
       if (result.access_token) {
         localStorage.setItem("token", result.access_token);
         console.log("Token stored in localStorage");
+        router.push("/"); // Redirect to home page
       }
       console.log("Login Response:", result);
     } catch (error) {
