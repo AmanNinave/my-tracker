@@ -28,6 +28,11 @@ export default function LoginPage() {
         }).toString(),
       });
       const result = await response.json();
+      
+      if (result.access_token) {
+        localStorage.setItem("token", result.access_token);
+        console.log("Token stored in localStorage");
+      }
       console.log("Login Response:", result);
     } catch (error) {
       console.error("Login Failed:", error);
