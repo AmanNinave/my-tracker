@@ -13,6 +13,22 @@ export interface Break{
   category : string 
 }
 
+export interface Event {
+  id: number;
+  type: string;
+  plannedStartTime: string;
+  plannedEndTime?: string;
+  category: string;
+  subCategory?: string;
+  title: string;
+  description: string;
+  remark?: string;
+  rating?: number;
+  breaks?: number;
+  subTasks?: string[];
+  status: string;
+}
+
 export interface EventUpdates {
   type: string | null;
   date: string | Date | null;

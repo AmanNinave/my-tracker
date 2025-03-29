@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, JSON
 from .database import Base
 from sqlalchemy.orm import relationship
 
@@ -22,4 +22,28 @@ class User(Base):
     email = Column(String)
     password = Column(String)
 
-    blogs = relationship('Blog', back_populates="creator")
+    blogs = relationship('Blog', back_populates="creator") # Relationship with Blog
+    events = relationship("Event", back_populates="creator") # Relationship with Event
+
+class Event(Base):
+    __tablename__ = "events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    sub_category = Column(String, nullable=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    planned_start_time = Column(DateTime, nullable=False)
+    planned_end_time = Column(DateTime, nullable=True)
+    actual_start_time = Column(DateTime, nullable=True)
+    actual_end_time = Column(DateTime, nullable=True)
+    remark = Column(String, nullable=True)
+    rating = Column(Integer, nullable=True)
+    breaks = Column(JSON, nullable=True)  # Storing list as JSON
+    sub_tasks = Column(JSON, nullable=True)  # Storing list as JSON
+    status = Column(String, default="pending")
+
+    user_id = Column(Integer, ForeignKey("users.id"))  # Foreign key to User
+
+    creator = relationship("User", back_populates="events")  # Relationship with User

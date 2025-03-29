@@ -3,12 +3,15 @@ import MainView from "@/components/MainView";
 import { db } from "@/db/drizzle";
 import { CalendarEventType } from "@/lib/store";
 import dayjs from "dayjs";
+import { Event } from "@/utils/constants";
+import { fetchEvents } from "@/utils/api";
+
 
 const getEventsData = async () => {
-  try {
-    const data = await db.query.eventsTable.findMany();
 
-    // Convert the Dayjs object to a simple ISO string
+  try {
+    const data: Event[] = await fetchEvents();
+    console.log("Fetched data:", data);
     return data.map((event) => ({
       ...event,
       date: dayjs(event.plannedStartTime).toISOString(), // Convert Dayjs to string
