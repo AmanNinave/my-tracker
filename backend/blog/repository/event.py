@@ -8,20 +8,20 @@ def create(request: schemas.EventCreate, db: Session):
 
     new_event = models.Event(
         type=request.type,
-        planned_start_time=request.planned_start_time,
-        planned_end_time=request.planned_end_time,
-        actual_start_time=request.actual_start_time,
-        actual_end_time=request.actual_end_time,
+        plannedStartTime=request.plannedStartTime,
+        plannedEndTime=request.plannedEndTime,
+        actualStartTime=request.actualStartTime,
+        actualEndTime=request.actualEndTime,
         category=request.category,
-        sub_category=request.sub_category,
+        subCategory=request.subCategory,
         title=request.title,
         description=request.description,
         remark=request.remark,
         rating=request.rating,
         breaks=request.breaks,
-        sub_tasks=request.sub_tasks,
+        subTasks=request.subTasks,
         status=request.status,
-        user_id=1
+        userId=1
     )
 
     db.add(new_event)

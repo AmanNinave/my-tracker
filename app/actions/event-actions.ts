@@ -6,6 +6,12 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { Break, Task } from "@/utils/constants";
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_API + "/events";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export async function createEvent(
   formData: FormData,
@@ -26,31 +32,38 @@ export async function createEvent(
   const plannedEndTime = formData.get("plannedEndTime") as string;
   const actualStartTime = formData.get("actualStartTime") as string;
   const actualEndTime = formData.get("actualEndTime") as string;
-
-  const plannedStartDateTime = new Date(`${date}T${plannedStartTime}:00`);
-  const plannedEndDateTime = plannedEndTime ? new Date(`${date}T${plannedEndTime}:00`) : null;
-  const actualStartDateTime = actualStartTime ? new Date(actualStartTime) : null;
-  const actualEndDateTime = actualEndTime ? new Date(actualEndTime) : null;
-
+  
+  const plannedStartDateTime = dayjs.tz(`${date}T${plannedStartTime}`, "Asia/Kolkata").utc().toISOString();
+  const plannedEndDateTime = plannedEndTime
+    ? dayjs.tz(`${date}T${plannedEndTime}`, "Asia/Kolkata").utc().toISOString()
+    : null;
+  const actualStartDateTime = actualStartTime
+    ? dayjs.tz(actualStartTime, "Asia/Kolkata").utc().toISOString()
+    : null;
+  const actualEndDateTime = actualEndTime
+    ? dayjs.tz(actualEndTime, "Asia/Kolkata").utc().toISOString()
+    : null;
+  
   if (!type || !plannedStartDateTime || !category || !title || !description) {
     return { error: "Required fields are missing" };
   }
-
+  
+  console.log(`${date}T${plannedStartTime}:00`, plannedStartDateTime, plannedEndDateTime, actualStartTime, actualEndTime);
   const requestBody: Record<string, any> = {
     type,
-    planned_start_time: plannedStartDateTime,
-    planned_end_time: plannedEndDateTime,
-    actual_start_time: actualStartDateTime,
-    actual_end_time: actualEndDateTime,
+    plannedStartTime: plannedStartDateTime,
+    plannedEndTime: plannedEndDateTime,
+    actualStartTime: actualStartDateTime,
+    actualEndTime: actualEndDateTime,
     category,
     title,
     description,
     status,
-    sub_category:subCategory,
+    subCategory,
     remark,
     rating,
     breaks,
-    sub_tasks: tasks,
+    subTasks: tasks,
   };
 
   try {

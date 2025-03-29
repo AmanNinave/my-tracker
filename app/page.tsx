@@ -3,9 +3,14 @@ import MainView from "@/components/MainView";
 import { db } from "@/db/drizzle";
 import { CalendarEventType } from "@/lib/store";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { Event } from "@/utils/constants";
 import { fetchEvents } from "@/utils/api";
 
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const getEventsData = async () => {
 
@@ -14,7 +19,11 @@ const getEventsData = async () => {
     console.log("Fetched data:", data);
     return data.map((event) => ({
       ...event,
-      date: dayjs(event.plannedStartTime).toISOString(), // Convert Dayjs to string
+      date: dayjs.utc(event.plannedStartTime).tz("Asia/Kolkata").format(),
+      plannedStartTime: dayjs.utc(event.plannedStartTime).tz("Asia/Kolkata").format(),
+      plannedEndTime: event.plannedEndTime ? dayjs.utc(event.plannedEndTime).tz("Asia/Kolkata").format() : null,
+      actualStartTime: event.actualStartTime ? dayjs.utc(event.actualStartTime).tz("Asia/Kolkata").format() : null,
+      actualEndTime: event.actualEndTime ? dayjs.utc(event.actualEndTime).tz("Asia/Kolkata").format() : null,
     }));
   } catch (error) {
     console.error("Error fetching data from the database:", error);

@@ -59,7 +59,7 @@ export default function MainView({
       updatedAt: dayjs(event.updatedAt),
       date: dayjs(event.plannedStartTime), // Event date
     }));       
-
+    console.log("Mapped events:", mappedEvents);
     setEvents(mappedEvents);
   }, [eventsData, setEvents]);
 

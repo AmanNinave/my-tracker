@@ -18,6 +18,9 @@ export interface Event {
   type: string;
   plannedStartTime: string;
   plannedEndTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  date: string | Date;
   category: string;
   subCategory?: string;
   title: string;

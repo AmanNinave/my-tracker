@@ -49,17 +49,17 @@ class TokenData(BaseModel):
 class EventBase(BaseModel):
     type: str
     category: str
-    sub_category: Optional[str] = None
+    subCategory: Optional[str] = None
     title: str
     description: str
-    planned_start_time: datetime
-    planned_end_time: Optional[datetime] = None
-    actual_start_time: Optional[datetime] = None
-    actual_end_time: Optional[datetime] = None
+    plannedStartTime: datetime
+    plannedEndTime: Optional[datetime] = None
+    actualStartTime: Optional[datetime] = None
+    actualEndTime: Optional[datetime] = None
     remark: Optional[str] = None
     rating: Optional[int] = None
     breaks: Optional[List[str]] = []
-    sub_tasks: Optional[List[str]] = []
+    subTasks: Optional[List[str]] = []
     status: Optional[str] = "pending"  # Default status
 
 # Schema for Creating an Event (Extends EventBase)
@@ -72,17 +72,17 @@ class EventCreate(EventBase):
 class EventUpdate(BaseModel):
     type: Optional[str] = None
     category: Optional[str] = None
-    sub_category: Optional[str] = None
+    subCategory: Optional[str] = None
     title: Optional[str] = None
     description: Optional[str] = None
-    planned_start_time: Optional[datetime] = None
-    planned_end_time: Optional[datetime] = None
-    actual_start_time: Optional[datetime] = None
-    actual_end_time: Optional[datetime] = None
+    plannedStartTime: Optional[datetime] = None
+    plannedEndTime: Optional[datetime] = None
+    actualStartTime: Optional[datetime] = None
+    actualEndTime: Optional[datetime] = None
     remark: Optional[str] = None
     rating: Optional[int] = None
     breaks: Optional[List[str]] = None
-    sub_tasks: Optional[List[str]] = None
+    subTasks: Optional[List[str]] = None
     status: Optional[str] = None
 
 # Schema for Returning Event Details
