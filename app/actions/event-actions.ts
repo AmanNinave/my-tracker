@@ -27,10 +27,10 @@ export async function createEvent(
   const actualStartTime = formData.get("actualStartTime") as string;
   const actualEndTime = formData.get("actualEndTime") as string;
 
-  const plannedStartDateTime = new Date(`${date}T${plannedStartTime}:00`).toISOString();
-  const plannedEndDateTime = plannedEndTime ? new Date(`${date}T${plannedEndTime}:00`).toISOString() : null;
-  const actualStartDateTime = actualStartTime ? new Date(actualStartTime).toISOString() : null;
-  const actualEndDateTime = actualEndTime ? new Date(actualEndTime).toISOString() : null;
+  const plannedStartDateTime = new Date(`${date}T${plannedStartTime}:00`);
+  const plannedEndDateTime = plannedEndTime ? new Date(`${date}T${plannedEndTime}:00`) : null;
+  const actualStartDateTime = actualStartTime ? new Date(actualStartTime) : null;
+  const actualEndDateTime = actualEndTime ? new Date(actualEndTime) : null;
 
   if (!type || !plannedStartDateTime || !category || !title || !description) {
     return { error: "Required fields are missing" };
