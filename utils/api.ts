@@ -8,8 +8,10 @@ export const fetchEvents = async () => {
   return res.json();
 };
 
-export const createEvent = async (eventData: any) => {
-  const res = await fetch(`${API_URL}/create`, {
+
+
+export const createEvent = async (eventData: any , tasks: any) => {
+  const res = await fetch(`${API_URL}/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(eventData),

@@ -5,61 +5,73 @@ import { eventsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { Break, Task } from "@/utils/constants";
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_API + "/events";
 
-// Function to create an event or task
-export async function createEvent(formData: FormData, tasks : Task[]): Promise<{ error: string } | { success: boolean }> {
-  const type = formData.get('type') as string; // task or event
-  const date = formData.get('date') as string;
-  const category = formData.get('category') as string ;
-  const subCategory = formData.get('subCategory') as string;
-  const status = formData.get('status') as string;
-  const title = formData.get('title') as string;
-  const description = formData.get('description') as string;
-  const remark = formData.get('remark') as string;
-  const rating = formData.get('rating') ? parseInt(formData.get('rating') as string, 10) : null;
-  const breaks = formData.get('breaks') ? JSON.parse(formData.get('breaks') as string) : [];
-  
-  const actualStartTime = formData.get('actualStartTime') as string;
-  const actualEndTime = formData.get('actualEndTime') as string;
-  
-  const plannedStartTime = formData.get('plannedStartTime')  as string;
-  const plannedStartDateTime = new Date(`${date}T${plannedStartTime}:00`);
-  
-  const plannedEndTime = formData.get('plannedEndTime') as string;
-  const plannedEndDateTime = plannedEndTime ? new Date(`${date}T${plannedEndTime}:00`) : null;
-  
-  // Validate required fields
+export async function createEvent(
+  formData: FormData,
+  tasks: Task[]
+): Promise<{ error: string } | { success: boolean }> {
+  const type = formData.get("type") as string;
+  const date = formData.get("date") as string;
+  const category = formData.get("category") as string;
+  const subCategory = formData.get("subCategory") as string;
+  const status = formData.get("status") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const remark = formData.get("remark") as string;
+  const rating = formData.get("rating") ? parseInt(formData.get("rating") as string, 10) : 0;
+  const breaks = formData.get("breaks") ? JSON.parse(formData.get("breaks") as string) : [];
+
+  const plannedStartTime = formData.get("plannedStartTime") as string;
+  const plannedEndTime = formData.get("plannedEndTime") as string;
+  const actualStartTime = formData.get("actualStartTime") as string;
+  const actualEndTime = formData.get("actualEndTime") as string;
+
+  const plannedStartDateTime = new Date(`${date}T${plannedStartTime}:00`).toISOString();
+  const plannedEndDateTime = plannedEndTime ? new Date(`${date}T${plannedEndTime}:00`).toISOString() : null;
+  const actualStartDateTime = actualStartTime ? new Date(actualStartTime).toISOString() : null;
+  const actualEndDateTime = actualEndTime ? new Date(actualEndTime).toISOString() : null;
+
   if (!type || !plannedStartDateTime || !category || !title || !description) {
-    return { error: 'Required fields are missing' };
+    return { error: "Required fields are missing" };
   }
+
+  const requestBody: Record<string, any> = {
+    type,
+    planned_start_time: plannedStartDateTime,
+    planned_end_time: plannedEndDateTime,
+    actual_start_time: actualStartDateTime,
+    actual_end_time: actualEndDateTime,
+    category,
+    title,
+    description,
+    status,
+    sub_category:subCategory,
+    remark,
+    rating,
+    breaks,
+    sub_tasks: tasks,
+  };
 
   try {
-    await db.insert(eventsTable).values({
-      type,
-      plannedStartTime: plannedStartDateTime,
-      plannedEndTime: plannedEndDateTime,
-      actualStartTime: actualStartTime ? new Date(actualStartTime) : null,
-      actualEndTime: actualEndTime ? new Date(actualEndTime) : null,
-      category,
-      subCategory: subCategory || null,
-      title,
-      description,
-      remark: remark || null,
-      rating: rating || null,
-      breaks: breaks.length > 0 ? breaks : [],
-      subTasks: tasks,
-      status
+    const res = await fetch(`${API_URL}/`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(requestBody),
     });
 
-    // Revalidate the path and return a success response
-    revalidatePath("/");
+    if (!res.ok) throw new Error(`Failed to create event. Status: ${res.status}`);
 
-    return { success: true };
+    return res.json();
   } catch (error) {
-    console.error('Error creating event:', error);
-    return { error: 'Failed to create event' };
+    console.error("Error creating event:", error);
+    return { error: "Failed to create event" };
   }
 }
+
 
 interface EventUpdates {
   type: string | null;
